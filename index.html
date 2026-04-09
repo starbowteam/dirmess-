@@ -1,807 +1,516 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Dirmess — безопасный мессенджер нового поколения: шифрование, стена сообщений и встроенный AI. В разработке, ищем инвесторов.">
-    <meta name="keywords" content="мессенджер, шифрование, стена, dirmess, приватность, инвесторы">
-    <meta property="og:title" content="Dirmess | Безопасный мессенджер">
-    <meta property="og:description" content="Шифрование, стена сообщений и AI внутри. Присоединяйся к разработке!">
-    <meta property="og:type" content="website">
-    <title>Dirmess — мессенджер с шифрованием и AI</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0a0a0f;
-            font-family: 'Inter', sans-serif;
-            color: #e5e7eb;
-            line-height: 1.5;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Canvas с эффектом 0 и 1 (матрица) */
-        #binaryCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.35;
-        }
-
-        .container {
-            position: relative;
-            z-index: 2;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        /* Полупрозрачные блоки */
-        .navbar, .hero, .section, .footer, .card, .stats, .steps, .faq-item, .creator-card, .dev-banner {
-            background: rgba(10, 10, 15, 0.75);
-            backdrop-filter: blur(8px);
-            border-radius: 32px;
-            transition: all 0.3s;
-            border: 1px solid rgba(156, 163, 175, 0.2);
-        }
-
-        .navbar {
-            background: rgba(10, 10, 15, 0.65);
-            backdrop-filter: blur(8px);
-            padding: 20px 28px;
-            margin-top: 20px;
-        }
-
-        .hero {
-            background: rgba(10, 10, 15, 0.6);
-            padding: 60px 40px;
-            margin: 40px 0;
-        }
-
-        .section {
-            padding: 70px 0;
-            margin-bottom: 40px;
-            border-radius: 48px;
-        }
-
-        .card, .faq-item, .creator-card, .dev-banner {
-            background: rgba(17, 17, 22, 0.85);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(156, 163, 175, 0.25);
-        }
-
-        :root {
-            --bg-dark: #0a0a0f;
-            --bg-card: rgba(17, 17, 22, 0.85);
-            --border-dim: rgba(156, 163, 175, 0.3);
-            --text-light: #e5e7eb;
-            --text-muted: #b0b3b8;
-            --btn-bg: #1a1a22;
-            --btn-hover: #2a2a33;
-            --grad-silver: linear-gradient(135deg, #2a2a33, #1a1a22);
-        }
-
-        @keyframes fadeUp {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes typingPulse {
-            0%, 100% { opacity: 0.4; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            animation: fadeUp 0.6s ease;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--text-light);
-        }
-
-        .logo-img {
-            height: 42px;
-            width: auto;
-            object-fit: contain;
-            border-radius: 12px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: var(--text-light);
-            text-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
-        }
-
-        .hero h1 {
-            font-size: clamp(40px, 8vw, 72px);
-            font-weight: 800;
-            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 24px;
-            letter-spacing: -1px;
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            max-width: 700px;
-            margin: 0 auto 40px;
-        }
-
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary, .btn-secondary {
-            background: var(--grad-silver);
-            padding: 14px 36px;
-            border-radius: 40px;
-            font-weight: 600;
-            border: 1px solid var(--border-dim);
-            cursor: pointer;
-            transition: 0.3s;
-            color: var(--text-light);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary:hover, .btn-secondary:hover {
-            transform: scale(1.02);
-            background: #2a2a33;
-            border-color: #6b6e7a;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .btn-discord {
-            background: #5865f2;
-            border: none;
-        }
-
-        .btn-discord:hover {
-            background: #4752c4;
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 56px;
-            letter-spacing: -0.5px;
-        }
-
-        .section-title span {
-            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 40px;
-            padding: 0 24px;
-        }
-
-        .card {
-            border-radius: 32px;
-            padding: 32px 24px;
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(176, 179, 184, 0.6);
-            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.6);
-        }
-
-        .card-icon {
-            font-size: 40px;
-            background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 20px;
-        }
-
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 12px;
-        }
-
-        .card p {
-            color: var(--text-muted);
-        }
-
-        /* Стена */
-        .wall-demo {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .wall-post {
-            background: rgba(26, 26, 34, 0.8);
-            backdrop-filter: blur(4px);
-            border-radius: 28px;
-            padding: 20px 28px;
-            border: 1px solid rgba(156, 163, 175, 0.3);
-            transition: 0.2s;
-        }
-
-        .wall-post:hover {
-            border-color: rgba(176, 179, 184, 0.6);
-            transform: translateX(6px);
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 16px;
-        }
-
-        .post-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #2a2a33;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: #9ca3af;
-        }
-
-        .post-author {
-            font-weight: 700;
-        }
-
-        .post-time {
-            font-size: 0.75rem;
-            color: #6b7280;
-        }
-
-        .post-content {
-            font-size: 1rem;
-            margin-bottom: 12px;
-            color: #e5e7eb;
-        }
-
-        .post-stats {
-            display: flex;
-            gap: 20px;
-            font-size: 0.85rem;
-            color: #9ca3af;
-        }
-
-        /* Баннер разработки и инвесторов */
-        .dev-banner {
-            text-align: center;
-            padding: 60px 40px;
-            margin: 0 24px;
-            border-radius: 48px;
-            background: linear-gradient(135deg, rgba(20, 20, 30, 0.9), rgba(10, 10, 20, 0.95));
-            border: 1px solid rgba(88, 101, 242, 0.5);
-        }
-
-        .dev-banner h2 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, #ffffff, #9ca3af);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .dev-banner .dev-text {
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .investor-text {
-            font-size: 1.2rem;
-            color: #b0b3b8;
-            margin-bottom: 32px;
-        }
-
-        .btn-invest {
-            background: #5865f2;
-            padding: 16px 42px;
-            font-size: 1.2rem;
-            border-radius: 60px;
-            font-weight: 700;
-            display: inline-block;
-            transition: 0.3s;
-        }
-
-        .btn-invest:hover {
-            background: #4752c4;
-            transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(88, 101, 242, 0.4);
-        }
-
-        .steps {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
-            margin-top: 40px;
-        }
-
-        .step {
-            text-align: center;
-            max-width: 220px;
-            background: rgba(17, 17, 22, 0.7);
-            padding: 24px 16px;
-            border-radius: 32px;
-            backdrop-filter: blur(4px);
-        }
-
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-dim);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #2a2a33, #1a1a22);
-        }
-
-        .creator-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 48px;
-            margin-top: 20px;
-        }
-
-        .creator-card {
-            border-radius: 48px;
-            padding: 32px 28px;
-            text-align: center;
-            width: 280px;
-            transition: 0.3s;
-        }
-
-        .creator-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(176, 179, 184, 0.6);
-        }
-
-        .creator-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto 20px;
-            border: 2px solid #9ca3af;
-        }
-
-        .creator-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .social-links a {
-            color: #9ca3af;
-            font-size: 24px;
-            margin: 0 12px;
-            transition: 0.2s;
-        }
-
-        .social-links a:hover {
-            color: white;
-        }
-
-        .faq-list {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .faq-item {
-            margin-bottom: 20px;
-            border-radius: 24px;
-            padding: 20px 28px;
-            cursor: pointer;
-        }
-
-        .faq-question {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-            color: #b0b3b8;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 200px;
-            padding-top: 16px;
-        }
-
-        .footer {
-            background: rgba(10, 10, 15, 0.7);
-            backdrop-filter: blur(8px);
-            text-align: center;
-            padding: 48px 20px 32px;
-            margin: 40px 0 20px;
-            border-radius: 48px;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-
-        .footer-links a {
-            color: #9ca3af;
-            text-decoration: none;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .sponsor-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 20px;
-            font-size: 0.95rem;
-            color: #b0b3b8;
-            flex-wrap: wrap;
-        }
-
-        .sponsor-avatar-small {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        /* Адаптивные улучшения */
-        @media (max-width: 768px) {
-            .container { padding: 0 16px; }
-            .navbar { padding: 16px 20px; }
-            .hero { padding: 40px 20px; margin: 20px 0; }
-            .hero h1 { font-size: 2rem; }
-            .hero p { font-size: 1rem; }
-            .section { padding: 40px 0; margin-bottom: 24px; border-radius: 32px; }
-            .section-title { font-size: 1.8rem; margin-bottom: 32px; }
-            .grid-3 { gap: 20px; padding: 0 16px; }
-            .card { padding: 24px 20px; }
-            .card h3 { font-size: 1.3rem; }
-            .dev-banner { padding: 32px 20px; margin: 0; }
-            .dev-banner h2 { font-size: 2rem; }
-            .dev-banner .dev-text { font-size: 1.2rem; }
-            .investor-text { font-size: 1rem; }
-            .btn-invest { padding: 12px 28px; font-size: 1rem; }
-            .steps { gap: 20px; }
-            .step { max-width: 180px; padding: 20px 12px; }
-            .step-number { width: 40px; height: 40px; font-size: 1.2rem; }
-            .creator-wrapper { gap: 24px; }
-            .creator-card { width: 260px; padding: 24px 20px; }
-            .creator-avatar { width: 100px; height: 100px; }
-            .wall-demo { padding: 0 16px; }
-            .wall-post { padding: 16px 20px; }
-            .faq-list { padding: 0 16px; }
-            .faq-item { padding: 16px 20px; }
-            .footer-links { gap: 20px; }
-            .footer-links a { font-size: 0.9rem; }
-            .sponsor-row { font-size: 0.85rem; }
-        }
-
-        @media (max-width: 480px) {
-            .logo span { font-size: 1.2rem; }
-            .nav-links { gap: 16px; }
-            .nav-links a { font-size: 0.85rem; }
-            .hero-buttons .btn-primary, .hero-buttons .btn-secondary { padding: 10px 20px; font-size: 0.9rem; }
-            .section-title { font-size: 1.5rem; }
-            .card-icon { font-size: 32px; }
-            .step { max-width: 160px; }
-            .step p { font-size: 0.85rem; }
-            .creator-card { width: 100%; max-width: 280px; }
-            .dev-banner h2 { font-size: 1.6rem; }
-            .dev-banner .dev-text { font-size: 1rem; }
-            .btn-invest { padding: 10px 20px; font-size: 0.9rem; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Dirmess — безопасный мессенджер с шифрованием, стеной и AI. Экосистема Diamond. Будущее общения.">
+  <title>Dirmess · серебряная экосистема</title>
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0b0d12;
+      font-family: 'Inter', sans-serif;
+      color: #eef3fc;
+      line-height: 1.5;
+      overflow-x: hidden;
+      position: relative;
+    }
+    #bgCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+    .wrapper {
+      position: relative;
+      z-index: 5;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px 24px 40px;
+    }
+    :root {
+      --silver: #d1d9e6;
+      --metal: linear-gradient(145deg, #e2e9f4 0%, #a6b4cc 80%);
+      --glass: rgba(20, 30, 45, 0.35);
+      --glass-border: rgba(210, 225, 255, 0.25);
+    }
+    .glass-panel {
+      background: var(--glass);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 48px;
+      box-shadow: 0 25px 40px -15px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.06);
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 36px;
+      margin-bottom: 30px;
+      border-radius: 60px;
+      background: rgba(16, 22, 32, 0.5);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(180, 200, 240, 0.2);
+      box-shadow: 0 0 25px rgba(150, 180, 255, 0.3);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-img {
+      height: 46px; width: 46px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 0 20px #6d8fc6;
+      border: 1px solid #b0c6e0;
+    }
+    .logo span {
+      font-size: 28px; font-weight: 800;
+      background: linear-gradient(135deg, #f0f5ff, #b4c6e0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .nav-links { display: flex; gap: 40px; flex-wrap: wrap; }
+    .nav-links a {
+      color: #ccdaee; text-decoration: none; font-weight: 500;
+      transition: 0.2s; font-size: 1.1rem;
+    }
+    .nav-links a:hover { color: white; text-shadow: 0 0 12px #aac8ff; }
+    .btn {
+      padding: 14px 34px; border-radius: 50px; font-weight: 700;
+      transition: all 0.25s; text-decoration: none; display: inline-flex;
+      align-items: center; gap: 10px;
+      border: 1px solid rgba(210, 225, 255, 0.5);
+      background: linear-gradient(145deg, #28344a, #101a28);
+      color: #f0f5ff; box-shadow: 0 10px 20px -5px #00000080;
+      backdrop-filter: blur(5px);
+    }
+    .btn-primary {
+      background: linear-gradient(145deg, #3f5570, #1f2a3a);
+      border-color: #b8cef0;
+      box-shadow: 0 0 20px #7a9bcb;
+    }
+    .btn-discord { background: #5865f2; border-color: #b1befa; }
+    .btn:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 20px 30px -8px black, 0 0 30px #8aacf0;
+    }
+    .hero {
+      display: flex; flex-wrap: wrap; align-items: center;
+      padding: 60px 40px; margin-bottom: 50px;
+      background: radial-gradient(circle at 30% 20%, rgba(80,120,200,0.15), transparent 70%);
+    }
+    .hero-content { flex: 1; min-width: 300px; }
+    .hero h1 {
+      font-size: clamp(52px, 10vw, 96px); font-weight: 800; line-height: 1;
+      background: linear-gradient(145deg, #f0f8ff, #c0d0f0, #a0b8e0);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 24px; letter-spacing: -2px;
+      text-shadow: 0 0 50px #6080c0;
+    }
+    .hero p { font-size: 1.4rem; color: #c2d2ec; max-width: 600px; margin-bottom: 40px; }
+    .hero-visual {
+      flex: 1; min-width: 300px; display: flex; justify-content: center;
+      perspective: 1200px;
+    }
+    .silver-card {
+      background: rgba(30, 45, 70, 0.4); backdrop-filter: blur(12px);
+      padding: 28px 24px; border-radius: 56px;
+      border: 1px solid #a0b8e0;
+      transform: rotateY(-6deg) rotateX(4deg);
+      box-shadow: 40px 40px 50px -10px #000000, 0 0 40px #3f5f90;
+      max-width: 380px;
+    }
+    .section { padding: 60px 0; }
+    .section-title {
+      font-size: 3.5rem; font-weight: 700; text-align: center; margin-bottom: 56px;
+      background: linear-gradient(135deg, #f5faff, #b0c6ea);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .grid-3 {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px;
+    }
+    .feature-card {
+      background: rgba(20, 35, 55, 0.4); backdrop-filter: blur(10px);
+      border-radius: 44px; padding: 44px 28px;
+      border: 1px solid rgba(160, 190, 240, 0.4);
+      box-shadow: 0 30px 30px -15px #00000080;
+      transition: all 0.35s;
+    }
+    .feature-card:hover {
+      transform: translateY(-15px) rotateX(2deg) rotateY(3deg);
+      border-color: #b8d0ff; box-shadow: 0 40px 40px -20px black, 0 0 40px #6080c0;
+    }
+    .feature-icon { font-size: 48px; margin-bottom: 24px; color: #c8dcff; }
+    .demo-wrapper {
+      background: rgba(8, 16, 28, 0.6); backdrop-filter: blur(12px);
+      border-radius: 60px; padding: 32px 24px;
+      border: 1px solid #8aa0c8; box-shadow: inset 0 0 30px #1a2a4020, 0 30px 40px -20px black;
+      margin: 40px 0;
+    }
+    .messenger-demo {
+      display: flex; gap: 16px; height: 580px;
+    }
+    .demo-panel {
+      background: rgba(10, 18, 30, 0.7); backdrop-filter: blur(12px);
+      border-radius: 32px; border: 1px solid #7f9bc0;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .demo-left { width: 280px; }
+    .demo-center { flex: 1; }
+    .demo-right { width: 260px; }
+    .panel-header {
+      padding: 16px 22px; font-weight: 600; border-bottom: 1px solid #7f9bc0;
+    }
+    .panel-content { flex: 1; overflow-y: auto; padding: 14px; }
+    .chat-item {
+      display: flex; align-items: center; padding: 12px; border-radius: 22px;
+      background: #152433; margin-bottom: 6px; cursor: pointer;
+      border: 1px solid #3f5a7a;
+    }
+    .chat-item.active { background: #2c4870; border-color: #b0c8f0; }
+    .wall-post {
+      background: #0d1a28cc; border-radius: 24px; padding: 20px; margin-bottom: 16px;
+      border: 1px solid #6a8bb0;
+    }
+    .cipher-game {
+      background: linear-gradient(145deg, #1a273f, #0e1625);
+      border-radius: 48px; padding: 40px 32px;
+      border: 1px solid #a0b8e0; box-shadow: 0 0 40px #4060a0;
+      margin: 50px 0;
+    }
+    .cipher-title { font-size: 2.4rem; margin-bottom: 24px; }
+    .cipher-area {
+      display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;
+    }
+    .cipher-input {
+      flex: 2; min-width: 240px;
+      background: #0e1622; border: 2px solid #6a8bb0; border-radius: 40px;
+      padding: 18px 24px; color: white; font-size: 1.1rem;
+    }
+    .cipher-output {
+      background: #0e1622; border-radius: 40px; padding: 18px 24px;
+      border: 1px solid #b0c8f0; font-family: monospace; font-size: 1.3rem;
+      flex: 2;
+    }
+    .shift-control { display: flex; align-items: center; gap: 12px; }
+    .cipher-btn {
+      background: linear-gradient(145deg, #3f5570, #1a2638);
+      border: 1px solid #b0c8f0; border-radius: 40px; padding: 14px 28px;
+      font-weight: bold; color: white; cursor: pointer;
+    }
+    .ecosystem {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 40px;
+    }
+    .eco-card {
+      background: rgba(25, 40, 60, 0.5); backdrop-filter: blur(8px);
+      border-radius: 50px; padding: 36px 32px; width: 280px;
+      border: 1px solid #9fb6da; text-align: center;
+      box-shadow: 0 25px 30px -12px black;
+      transition: 0.3s;
+    }
+    .eco-card:hover { transform: translateY(-10px); border-color: #d0e0ff; }
+    .footer {
+      margin-top: 60px; padding: 40px 30px; border-radius: 60px;
+      text-align: center; background: rgba(12, 20, 32, 0.6);
+    }
+    @media (max-width: 900px) {
+      .messenger-demo { flex-direction: column; height: auto; }
+      .demo-left, .demo-right { width: 100%; max-height: 280px; }
+      .navbar { flex-wrap: wrap; }
+    }
+    @media (max-width: 600px) {
+      .wrapper { padding: 12px 12px 20px; }
+      .section-title { font-size: 2.2rem; }
+    }
+    @keyframes floatSilver {
+      0% { transform: translateY(0) rotateX(0); }
+      50% { transform: translateY(-12px) rotateX(2deg); }
+      100% { transform: translateY(0) rotateX(0); }
+    }
+    .float-silver { animation: floatSilver 8s infinite ease-in-out; }
+    .avatar-icon { font-size: 60px; color: #c8dcff; margin: 10px 0; }
+  </style>
 </head>
 <body>
-
-<canvas id="binaryCanvas"></canvas>
-
-<div class="container">
-    <div class="navbar">
-        <div class="logo">
-            <img src="https://cdn.discordapp.com/attachments/1223595469746475049/1491050644109525064/IMG_9362-Photoroom.png?ex=69d6489f&is=69d4f71f&hm=ab3de9428e9c3933274759ab20f67785d36f45b3248aa89fa6c07d14e404189f&" alt="Dirmess Logo" class="logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23e5e7eb%22%3E%3Cpath d=%22M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5%22/%3E%3C/svg%3E'">
-            <span>Dirmess - для тебя</span>
-        </div>
-        <div class="nav-links">
-            <a href="#features">Фичи</a>
-            <a href="#wall">Стена</a>
-            <a href="#dev">Разработка</a>
-            <a href="#creator">Создатель</a>
-            <a href="#faq">FAQ</a>
-        </div>
+<canvas id="bgCanvas"></canvas>
+<div class="wrapper">
+  <!-- НАВБАР -->
+  <div class="navbar">
+    <div class="logo">
+      <img src="https://cdn.discordapp.com/attachments/1223595469746475049/1491688536947032177/dirmesslogo.png?ex=69d89ab5&is=69d74935&hm=51985d9b545534b6adb544920c55f27672a7b5b4b802eb5b4b2c7d5e5c66afe7&" alt="Dirmess" class="logo-img" onerror="this.onerror=null; this.innerHTML='<i class=\'fas fa-lock\' style=\'font-size:36px;color:#b0c8f0;\'></i>';">
+      <span>Dirmess</span>
     </div>
-
-    <div class="hero">
-        <h1>Dirmess —<br>мессенджер с душой</h1>
-        <p>Шифрование, стена для идей и встроенный AI. Всё в одном флаконе. Приватность, стиль и мощь. Скоро на всех платформах.</p>
-        <div class="hero-buttons">
-            <a href="#dev" class="btn-primary">Следить за разработкой</a>
-            <a href="https://discord.gg/diamondshop" target="_blank" class="btn-primary btn-discord"><i class="fab fa-discord"></i> Сообщество</a>
-            <a href="#features" class="btn-secondary">О возможностях →</a>
-        </div>
+    <div class="nav-links">
+      <a href="#features">Возможности</a>
+      <a href="#demo">Демо</a>
+      <a href="#cipher">Шифроигра</a>
+      <a href="#ecosystem">Экосистема</a>
     </div>
+  </div>
 
-    <div class="section" id="features">
-        <div class="section-title"><span>Почему Dirmess?</span> — три кита</div>
-        <div class="grid-3">
-            <div class="card"><div class="card-icon"><i class="fas fa-shield-alt"></i></div><h3>Сквозное шифрование</h3><p>Все сообщения шифруются на устройстве. Даже мы не можем прочитать ваши диалоги. Ваша приватность — наш приоритет.</p></div>
-            <div class="card"><div class="card-icon"><i class="fas fa-newspaper"></i></div><h3>Стена сообщений</h3><p>Общая лента и личные стены. Делитесь мыслями, постами, фотографиями. Как в соцсети, но безопасно.</p></div>
-            <div class="card"><div class="card-icon"><i class="fas fa-robot"></i></div><h3>Встроенный AI</h3><p>Мы стараемся ввести Diamond AI в Dirmess. Поможет при написании сообщений и мысли.</p></div>
-        </div>
+  <!-- HERO -->
+  <div class="hero glass-panel">
+    <div class="hero-content">
+      <h1>Серебряный стандарт<br>общения</h1>
+      <p>E2E шифрование, стена идей, Diamond AI. Мессенджер с душой и металлическим блеском.</p>
+      <div style="display: flex; gap: 18px; flex-wrap: wrap;">
+        <a href="#demo" class="btn btn-primary"><i class="fas fa-cube"></i> Открыть демо</a>
+        <a href="https://discord.gg/diamondshop" target="_blank" class="btn btn-discord"><i class="fab fa-discord"></i> Diamond сервер</a>
+      </div>
     </div>
+    <div class="hero-visual">
+      <div class="silver-card float-silver">
+        <div style="display:flex; gap:12px; margin-bottom:24px;">
+          <div style="width:50px;height:50px;background:#2a4060;border-radius:20px;"></div>
+          <div><div style="height:12px;width:80px;background:#6a8bb0;border-radius:20px;"></div><div style="height:8px;width:50px;background:#3f5a7a;margin-top:8px;"></div></div>
+        </div>
+        <div style="background:#122336; border-radius:30px; padding:20px;">
+          <i class="fas fa-shield-alt"></i> Шифрование E2E<br>
+          <i class="fas fa-robot" style="margin-top:14px;"></i> Diamond AI активен
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <div class="section" id="wall">
-        <div class="section-title">Стена <span>живых сообщений</span></div>
-        <div class="wall-demo">
-            <div class="wall-post">
-                <div class="post-header"><div class="post-avatar"><i class="fas fa-user-astronaut"></i></div><div><div class="post-author">Алиса</div><div class="post-time">15 минут назад</div></div></div>
-                <div class="post-content">Только что попробовал встроенный AI — он объяснил мне сложный алгоритм за минуту! Dirmess реально next level 🔥</div>
-                <div class="post-stats"><span><i class="far fa-heart"></i> 24</span><span><i class="far fa-comment"></i> 7</span><span><i class="fas fa-lock"></i> шифрование активно</span></div>
-            </div>
-            <div class="wall-post">
-                <div class="post-header"><div class="post-avatar"><i class="fas fa-code"></i></div><div><div class="post-author">DevMind</div><div class="post-time">2 часа назад</div></div></div>
-                <div class="post-content">Стена в Dirmess — это как Twitter и Signal в одном. Без слежки, без цензуры. И AI помогает писать посты быстрее.</div>
-                <div class="post-stats"><span><i class="far fa-heart"></i> 89</span><span><i class="far fa-comment"></i> 15</span><span><i class="fas fa-lock"></i> шифрование активно</span></div>
-            </div>
-            <div class="wall-post">
-                <div class="post-header"><div class="post-avatar"><i class="fas fa-gem"></i></div><div><div class="post-author">viktorshopa</div><div class="post-time">Вчера</div></div></div>
-                <div class="post-content">А что я тут забыл? 😄 Жду ваши идеи в комментариях!</div>
-                <div class="post-stats"><span><i class="far fa-heart"></i> 156</span><span><i class="far fa-comment"></i> 33</span><span><i class="fas fa-lock"></i> шифрование активно</span></div>
-            </div>
-        </div>
+  <!-- FEATURES -->
+  <div class="section" id="features">
+    <div class="section-title">три грани совершенства</div>
+    <div class="grid-3">
+      <div class="feature-card"><div class="feature-icon"><i class="fas fa-lock"></i></div><h3>Сквозное шифрование</h3><p>Ключи только у вас. Полная приватность, даже сервер не читает переписку.</p></div>
+      <div class="feature-card"><div class="feature-icon"><i class="fas fa-border-all"></i></div><h3>Стена идей</h3><p>Публикуйте, комментируйте, вдохновляйтесь. Как соцсеть, но без алгоритмов слежки.</p></div>
+      <div class="feature-card"><div class="feature-icon"><i class="fas fa-microchip"></i></div><h3>Diamond AI</h3><p>Встроенный ассистент: код, тексты, переводы. Работает в каждом диалоге.</p></div>
     </div>
+  </div>
 
-    <!-- Блок разработки и инвесторов -->
-    <div class="section" id="dev">
-        <div class="dev-banner">
-            <h2> Разработка идёт полным ходом </h2>
-            <div class="dev-text">Мы создаём мессенджер будущего — с полным шифрованием, стеной и встроенным AI.</div>
-            <div class="investor-text"><strong>🔍 Ищем инвесторов и партнёров</strong> для ускорения релиза, масштабирования и внедрения передовых технологий.</div>
-            <a href="https://discord.gg/diamondshop" target="_blank" class="btn-primary btn-invest"><i class="fab fa-discord"></i> Стать инвестором</a>
-            <div style="margin-top: 30px; font-size: 0.9rem; color: #9ca3af;">Присоединяйтесь к сообществу, чтобы следить за новостями и влиять на разработку</div>
+  <!-- ДЕМО МЕССЕНДЖЕР -->
+  <div class="demo-wrapper" id="demo">
+    <div style="font-size:2.2rem; margin-bottom:20px; font-weight:600; text-align:center;"><span style="background:linear-gradient(145deg,#fff,#b0c8f0); -webkit-background-clip:text; background-clip:text; color:transparent;">живое демо</span></div>
+    <div class="messenger-demo">
+      <div class="demo-left demo-panel">
+        <div class="panel-header"><i class="fas fa-comments"></i> Чаты</div>
+        <div class="panel-content" id="demoChatsContainer"></div>
+      </div>
+      <div class="demo-center demo-panel">
+        <div class="panel-header"><i class="fas fa-hashtag"></i> <span id="demoChatTitle">Общая стена</span></div>
+        <div class="panel-content" id="demoMessagesArea"></div>
+        <div style="padding:12px; border-top:1px solid #7f9bc0; display:flex; gap:8px;">
+          <input id="demoMessageInput" placeholder="Сообщение..." style="flex:1; background:#0e1a28; border:1px solid #6a8bb0; border-radius:40px; padding:12px 18px; color:white;">
+          <button id="demoSendBtn" style="background:#2c4870; border:none; border-radius:40px; width:52px;"><i class="fas fa-paper-plane"></i></button>
         </div>
+      </div>
+      <div class="demo-right demo-panel">
+        <div class="panel-header"><i class="fas fa-id-card"></i> Профиль</div>
+        <div class="panel-content" style="text-align:center;">
+          <div id="profileAvatar" style="margin:20px 0;">
+            <img src="https://cdn.discordapp.com/attachments/1223595469746475049/1491688536485924935/IMG_9298.jpg?ex=69d89ab5&is=69d74935&hm=474227d010ee48b540fd9ba8926ea47cb3a76c18ecce1fdc494e6372c4f61799&" alt="viktorshopa" style="width:90px;height:90px;border-radius:50%; object-fit:cover; border:2px solid #b0c8f0;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-crown avatar-icon\'></i>';">
+          </div>
+          <h3>viktorshopa</h3>
+          <p style="color:#b0c8f0;">@creator · основатель</p>
+          <div class="profile-stat" style="display:flex; justify-content:center; gap:24px; margin:20px 0;">
+            <div><strong>156</strong><br>постов</div>
+            <div><strong>2.4k</strong><br>реакций</div>
+          </div>
+          <div style="background:#12263a; border-radius:28px; padding:16px; margin:20px 0;">
+            <i class="fab fa-discord"></i> discord.gg/diamondshop<br>
+            <span style="font-size:0.9rem;">экосистема Diamond</span>
+          </div>
+          <div><i class="fas fa-phone"></i> WebRTC · E2E звонки</div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="section">
-        <div class="section-title">Начать <span>использовать</span> — просто</div>
-        <div class="steps">
-            <div class="step"><div class="step-number">1</div><p>Открой веб-версию Dirmess — она уже перед тобой</p></div>
-            <div class="step"><div class="step-number">2</div><p>Зарегистрируйся (скоро) или войди через аккаунт</p></div>
-            <div class="step"><div class="step-number">3</div><p>Общайся, пиши на стену, вызывай AI командой /ai</p></div>
-        </div>
+  <!-- ИГРА ШИФР ЦЕЗАРЯ -->
+  <div class="cipher-game" id="cipher">
+    <div class="cipher-title"><i class="fas fa-key"></i> ШИФРОВАЛЬЩИК · задержитесь на минутку</div>
+    <p style="margin-bottom:28px; font-size:1.2rem; opacity:0.9;">Введите текст, выберите сдвиг — зашифруйте послание как настоящий криптограф.</p>
+    <div class="cipher-area">
+      <input type="text" id="cipherText" class="cipher-input" placeholder="Введите сообщение..." value="Привет, Dirmess!">
+      <div class="shift-control">
+        <span style="color:#b0c8f0;">Сдвиг:</span>
+        <input type="number" id="cipherShift" min="1" max="33" value="3" style="width:70px; background:#0e1622; border:1px solid #6a8bb0; border-radius:30px; padding:10px; color:white;">
+      </div>
+      <button id="encryptBtn" class="cipher-btn"><i class="fas fa-lock"></i> Зашифровать</button>
+      <button id="decryptBtn" class="cipher-btn"><i class="fas fa-unlock"></i> Расшифровать</button>
     </div>
+    <div style="margin-top:24px;">
+      <div style="color:#b0c8f0; margin-bottom:8px;">Результат:</div>
+      <div id="cipherResult" class="cipher-output">...</div>
+    </div>
+    <p style="margin-top:20px; opacity:0.8;"><i class="fas fa-gem"></i> Секретное слово дня: <span id="secretWordDisplay"></span> (расшифруйте сами!)</p>
+  </div>
 
-    <div class="section" id="creator">
-        <div class="section-title"><span>Создатель</span> и экосистема</div>
-        <div class="creator-wrapper">
-            <div class="creator-card">
-                <div class="creator-avatar">
-                    <img src="https://cdn.discordapp.com/attachments/1223595469746475049/1491047288770924554/IMG_9298.jpg?ex=69d6457f&is=69d4f3ff&hm=900125016becd82cd820018ca1428cc1057eb3be8aa5edb0543236a8bfe63f4a&" alt="viktorshopa" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%239ca3af%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E'">
-                </div>
-                <h3>viktorshopa</h3>
-                <p style="color:#b0b3b8">Создатель проекта, основатель Diamond AI</p>
-                <div class="social-links">
-                    <a href="https://discord.gg/diamondshop" target="_blank"><i class="fab fa-discord"></i></a>
-                </div>
-            </div>
-            <div class="creator-card">
-                <div class="creator-avatar">
-                    <img src="https://media.discordapp.net/attachments/1223595469746475049/1491050644767899751/image.png?ex=69d648a0&is=69d4f720&hm=fcd334a97e9b00d9a6826d71a0f0bf9166721b4a98bf20de8be0b3351a58af71&=&format=webp&quality=lossless&width=828&height=828" alt="Diamond" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%239ca3af%22%3E%3Cpath d=%22M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5%22/%3E%3C/svg%3E'">
-                </div>
-                <h3>Diamond</h3>
-                <p style="color:#b0b3b8">Технологии AI и поддержка проекта. Объединяем сообщество.</p>
-                <div class="social-links">
-                    <a href="https://discord.gg/diamondshop" target="_blank"><i class="fab fa-discord"></i></a>
-                </div>
-            </div>
+  <!-- ЭКОСИСТЕМА DIAMOND / СОЗДАТЕЛЬ -->
+  <div class="section" id="ecosystem">
+    <div class="section-title">экосистема Diamond</div>
+    <div class="ecosystem">
+      <div class="eco-card">
+        <div style="margin-bottom:20px;">
+          <img src="https://cdn.discordapp.com/attachments/1223595469746475049/1491688536485924935/IMG_9298.jpg?ex=69d89ab5&is=69d74935&hm=474227d010ee48b540fd9ba8926ea47cb3a76c18ecce1fdc494e6372c4f61799&" alt="viktorshopa" style="width:120px;height:120px;border-radius:50%; object-fit:cover; border:2px solid #b0c8f0;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-crown\' style=\'font-size:80px;color:#f0c040;\'></i>';">
         </div>
+        <h3>viktorshopa</h3>
+        <p>Создатель Dirmess, архитектор безопасности и AI.</p>
+        <a href="https://discord.gg/diamondshop" target="_blank" style="color:#b0c8f0;"><i class="fab fa-discord"></i> Сервер создателя</a>
+      </div>
+      <div class="eco-card">
+        <div style="margin-bottom:20px;">
+          <img src="https://cdn.discordapp.com/attachments/1223595469746475049/1491050644767899751/image.png?ex=69d842e0&is=69d6f160&hm=879114c2a9887acc7eb58ed1d6084a0eea52a28749d85839d5e97fc58426d488&" alt="Diamond" style="width:120px;height:120px;border-radius:50%; object-fit:cover; border:2px solid #b0c8f0;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-gem\' style=\'font-size:80px;color:#a0c0ff;\'></i>';">
+        </div>
+        <h3>Diamond AI</h3>
+        <p>Интеллектуальное ядро мессенджера. Помощник, генератор идей.</p>
+        <a href="https://discord.gg/diamondshop" target="_blank" style="color:#b0c8f0;"><i class="fab fa-discord"></i> Присоединиться</a>
+      </div>
     </div>
+    <div style="text-align:center; margin-top:30px;">
+      <a href="https://discord.gg/diamondshop" target="_blank" class="btn btn-primary"><i class="fab fa-discord"></i> Стать частью экосистемы</a>
+    </div>
+  </div>
 
-    <div class="section" id="faq">
-        <div class="section-title">Часто задаваемые <span>вопросы</span></div>
-        <div class="faq-list">
-            <div class="faq-item"><div class="faq-question"><span>Dirmess — это приложение или сайт?</span><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer">Прямо сейчас это веб-сайт мессенджера, но планируется добавить PWA (приложение).</div></div>
-            <div class="faq-item"><div class="faq-question"><span>Шифрование действительно полное?</span><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer">Да, все личные сообщения и данные шифруются на стороне клиента. Ключи хранятся только у вас. Стена также защищена.</div></div>
-            <div class="faq-item"><div class="faq-question"><span>Когда релиз?</span><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer">Активная разработка. Мы ищем инвесторов, чтобы ускорить процесс. Следите за новостями в сообществе!</div></div>
-            <div class="faq-item"><div class="faq-question"><span>Как помочь проекту?</span><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer">Присоединяйтесь к нашему Discord, делитесь идеями, становитесь инвестором или просто рассказывайте о нас друзьям.</div></div>
-        </div>
+  <!-- FOOTER -->
+  <div class="footer glass-panel">
+    <div style="display:flex; justify-content:center; gap:36px; margin-bottom:20px; flex-wrap:wrap;">
+      <a href="#" style="color:#ccdaee;">Условия</a>
+      <a href="#" style="color:#ccdaee;">Конфиденциальность</a>
+      <a href="https://discord.gg/diamondshop" target="_blank"><i class="fab fa-discord"></i> Diamond</a>
     </div>
-
-    <div class="footer">
-        <div class="footer-links">
-            <a href="https://discord.gg/diamondshop" target="_blank"><i class="fab fa-discord"></i> Сервер</a>
-            <a href="#" id="termsLink">Условия использования</a>
-            <a href="#" id="privacyLink">Политика конфиденциальности</a>
-        </div>
-        <div class="copyright">© 2026 Dirmess — безопасный мессенджер с душой. Разработка активна.</div>
-        <div class="sponsor-row">
-            <span>🤝 Спонсор проекта:</span>
-            <img src="https://cdn.discordapp.com/attachments/1213478356083937300/1491046821559271454/image.png?ex=69d64510&is=69d4f390&hm=3dd83047fea574f136f581c5c007e72476ee44faddaa20ed5dcfa58935584155&" alt="Тазик" class="sponsor-avatar-small" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%239ca3af%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E'">
-            <strong>Тазик</strong>
-        </div>
-    </div>
+    <div>© 2026 Dirmess · серебряная экосистема общения</div>
+  </div>
 </div>
 
-<!-- Модалки Terms / Privacy -->
-<div class="modal" id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center; z-index:1000;"><div style="background:#111116; border-radius:32px; padding:32px; max-width:500px; border:1px solid #2a2a33;"><h3><i class="fas fa-file-contract"></i> Terms of Use</h3><div style="margin:20px 0; max-height:60vh; overflow:auto"><p><strong>Dirmess</strong> — веб-мессенджер с шифрованием. Вы несете ответственность за свои сообщения на стене. Администрация не читает личные диалоги. Используя сервис, вы соглашаетесь с правилами сообщества.</p><p>По вопросам: abugay12@mail.ru</p></div><button id="closeTermsModal" style="background:#1a1a22; border:1px solid #2a2a33; padding:10px 20px; border-radius:40px; color:white; cursor:pointer;">Закрыть</button></div></div>
-<div class="modal" id="privacyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center; z-index:1000;"><div style="background:#111116; border-radius:32px; padding:32px; max-width:500px; border:1px solid #2a2a33;"><h3><i class="fas fa-shield-alt"></i> Политика конфиденциальности</h3><div style="margin:20px 0; max-height:60vh; overflow:auto"><p>Мы не собираем личные сообщения. Ваши данные хранятся локально в браузере. Шифрование end-to-end гарантирует приватность. Мы не передаём информацию третьим лицам.</p><p>Контакты: abugay12@mail.ru</p></div><button id="closePrivacyModal" style="background:#1a1a22; border:1px solid #2a2a33; padding:10px 20px; border-radius:40px; color:white; cursor:pointer;">Принять</button></div></div>
-
 <script>
-    // MATRIX 0/1 ЭФФЕКТ
-    const canvas = document.getElementById('binaryCanvas');
+  (() => {
+    // ----- фоновая сетка -----
+    const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
-    let width, height;
-    let drops = [];
-    const symbols = ['0', '1'];
+    let w, h;
+    function resizeBg() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
+    function drawBg() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.strokeStyle = '#6d8fc6'; ctx.lineWidth = 0.6;
+      const step = 40;
+      ctx.beginPath();
+      for (let i = 0; i <= w; i += step) { ctx.moveTo(i, 0); ctx.lineTo(i, h); }
+      for (let i = 0; i <= h; i += step) { ctx.moveTo(0, i); ctx.lineTo(w, i); }
+      ctx.strokeStyle = '#3f5f90'; ctx.stroke();
+      ctx.fillStyle = '#a0b8e010'; ctx.fillRect(0,0,w,h);
+      requestAnimationFrame(drawBg);
+    }
+    window.addEventListener('resize', resizeBg); resizeBg(); drawBg();
+
+    // ----- демо мессенджер -----
+    const demoChats = [
+      { id: 'wall', name: 'Общая стена', icon: 'fa-users', type: 'wall' },
+      { id: 'alice', name: 'Алиса', icon: 'fa-user-astronaut', type: 'direct' },
+      { id: 'dev', name: 'Dev Team', icon: 'fa-code', type: 'group' },
+    ];
+    const demoMessagesDB = {
+      wall: [
+        { author: 'Алиса', text: 'Шифрование — это база! 🔒', time: '5 мин', likes: 15 },
+        { author: 'DevMind', text: 'AI теперь умеет генерить код', time: '1 час', likes: 27 },
+      ],
+      alice: [
+        { author: 'Алиса', text: 'Привет! Видел новую игру с шифром?', time: '10:05', outgoing: false },
+        { author: 'Вы', text: 'Да, крутая фича!', time: '10:07', outgoing: true },
+      ],
+      dev: [
+        { author: 'Иван', text: 'Деплой прошел успешно', time: '09:20' },
+      ]
+    };
+    let activeDemo = 'wall';
+    const chatsEl = document.getElementById('demoChatsContainer');
+    const titleEl = document.getElementById('demoChatTitle');
+    const msgArea = document.getElementById('demoMessagesArea');
+    const inputMsg = document.getElementById('demoMessageInput');
+    const sendBtn = document.getElementById('demoSendBtn');
+
+    function renderChats() {
+      chatsEl.innerHTML = '';
+      demoChats.forEach(c => {
+        const d = document.createElement('div');
+        d.className = `chat-item ${c.id === activeDemo ? 'active' : ''}`;
+        d.innerHTML = `<i class="fas ${c.icon}"></i> <span style="margin-left:12px;">${c.name}</span>`;
+        d.onclick = () => { activeDemo = c.id; renderChats(); renderMessages(); };
+        chatsEl.appendChild(d);
+      });
+    }
+    function renderMessages() {
+      const chat = demoChats.find(c => c.id === activeDemo);
+      titleEl.textContent = chat.name;
+      const msgs = demoMessagesDB[activeDemo] || [];
+      let html = '';
+      if (chat.type === 'wall') {
+        msgs.forEach(m => html += `<div class="wall-post"><i class="fas fa-user"></i> <strong>${m.author}</strong> · ${m.time}<br>${m.text}<br><span style="opacity:0.7;">❤️ ${m.likes||0}</span></div>`);
+        html += `<div style="background:#1e3350; border-radius:22px; padding:14px;"><i class="fas fa-robot"></i> Diamond AI: напиши /ai</div>`;
+      } else {
+        msgs.forEach(m => html += `<div style="background:${m.outgoing?'#1e3a5f':'#12263a'}; border-radius:22px; padding:12px; margin-bottom:10px;"><strong>${m.author}</strong> · ${m.time}<br>${m.text}</div>`);
+      }
+      msgArea.innerHTML = html || '<div>Нет сообщений</div>';
+      msgArea.scrollTop = msgArea.scrollHeight;
+    }
+    sendBtn.onclick = () => {
+      const text = inputMsg.value.trim();
+      if(!text) return;
+      const chat = demoChats.find(c=>c.id===activeDemo);
+      const newMsg = { author: 'Вы', text, time: new Date().toLocaleTimeString().slice(0,5), outgoing: true };
+      if(chat.type==='wall') newMsg.likes = 0;
+      demoMessagesDB[activeDemo].push(newMsg);
+      inputMsg.value = '';
+      renderMessages();
+    };
+    renderChats(); renderMessages();
+
+    // ----- шифр цезаря -----
+    const cipherText = document.getElementById('cipherText');
+    const shiftInput = document.getElementById('cipherShift');
+    const resultDiv = document.getElementById('cipherResult');
+    const secretSpan = document.getElementById('secretWordDisplay');
     
-    function resizeCanvas() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-        const columns = Math.floor(width / 28);
-        drops = [];
-        for (let i = 0; i < columns; i++) {
-            drops[i] = Math.random() * -height;
-        }
+    function caesar(str, shift, decrypt = false) {
+      shift = parseInt(shift) % 33;
+      if (decrypt) shift = (33 - shift) % 33;
+      const alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ';
+      const upper = alphabet;
+      const lower = alphabet.toLowerCase();
+      let res = '';
+      for (let char of str) {
+        let idx = upper.indexOf(char);
+        if (idx !== -1) { res += upper[(idx + shift) % 33]; continue; }
+        idx = lower.indexOf(char);
+        if (idx !== -1) { res += lower[(idx + shift) % 33]; continue; }
+        res += char;
+      }
+      return res;
     }
     
-    function draw() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, width, height);
-        ctx.font = 'bold 22px "Courier New", monospace';
-        for (let i = 0; i < drops.length; i++) {
-            const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-            const x = i * 28;
-            const y = drops[i] * 28;
-            const brightness = Math.sin(Date.now() * 0.002 + i) * 0.5 + 0.5;
-            const greenVal = 80 + Math.floor(brightness * 100);
-            ctx.fillStyle = `rgba(0, ${greenVal}, 180, 0.7)`;
-            ctx.fillText(symbol, x, y);
-            if (y > height && Math.random() > 0.975) {
-                drops[i] = 0;
-            }
-            drops[i]++;
-        }
-        requestAnimationFrame(draw);
+    function updateCipher(decrypt = false) {
+      const text = cipherText.value;
+      let shift = parseInt(shiftInput.value) || 3;
+      const result = caesar(text, shift, decrypt);
+      resultDiv.textContent = result || '...';
     }
     
-    window.addEventListener('resize', () => { resizeCanvas(); });
-    resizeCanvas();
-    draw();
+    document.getElementById('encryptBtn').addEventListener('click', () => updateCipher(false));
+    document.getElementById('decryptBtn').addEventListener('click', () => updateCipher(true));
+    cipherText.addEventListener('input', () => updateCipher(false));
+    shiftInput.addEventListener('input', () => updateCipher(false));
     
-    // FAQ аккордеон
-    document.querySelectorAll('.faq-item').forEach(item => {
-        const q = item.querySelector('.faq-question');
-        q.addEventListener('click', () => {
-            item.classList.toggle('active');
-        });
-    });
+    // секретное слово дня (зашифрованное)
+    const secretWord = 'DIAMOND';
+    const secretEnc = caesar(secretWord, 5);
+    secretSpan.textContent = secretEnc;
     
-    // Модалки
-    const termsModal = document.getElementById('termsModal');
-    const privacyModal = document.getElementById('privacyModal');
-    document.getElementById('termsLink').addEventListener('click', (e) => { e.preventDefault(); termsModal.style.display = 'flex'; });
-    document.getElementById('privacyLink').addEventListener('click', (e) => { e.preventDefault(); privacyModal.style.display = 'flex'; });
-    document.getElementById('closeTermsModal').addEventListener('click', () => { termsModal.style.display = 'none'; });
-    document.getElementById('closePrivacyModal').addEventListener('click', () => { privacyModal.style.display = 'none'; });
-    window.addEventListener('click', (e) => { if(e.target === termsModal) termsModal.style.display = 'none'; if(e.target === privacyModal) privacyModal.style.display = 'none'; });
-    
-    // Плавный скролл по якорям
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-            const target = document.querySelector(href);
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    });
-    
-    // Анимация появления
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.card, .step, .wall-post, .creator-card, .dev-banner').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'all 0.6s ease';
-        observer.observe(el);
-    });
+    updateCipher(false);
+  })();
 </script>
 </body>
 </html>
