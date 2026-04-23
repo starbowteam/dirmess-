@@ -1,377 +1,48 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>.drm — мессенджер</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
-    <style>
-        /* === СТИЛИ (полные, как в предыдущем ответе, но собраны в одном файле) === */
-        :root {
-            --bg-primary: #0f141a;
-            --bg-secondary: #161e26;
-            --bg-tertiary: #1e2832;
-            --text-primary: #e6edf3;
-            --text-secondary: #8b9aac;
-            --accent: #4f667d;
-            --accent-hover: #5f7a94;
-            --border-color: #2a343f;
-            --danger: #e55353;
-            --success: #3fb68b;
-            --shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); height: 100vh; overflow: hidden; }
-        #app { width: 100%; height: 100%; }
-        .loading-screen { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 18px; color: var(--text-secondary); }
-        .screen { display: none; }
-        .auth-screen { align-items: center; justify-content: center; height: 100%; background: var(--bg-primary); }
-        .auth-container { width: 100%; max-width: 400px; padding: 24px; background: var(--bg-secondary); border-radius: 24px; box-shadow: var(--shadow); }
-        .auth-header { text-align: center; margin-bottom: 32px; }
-        .auth-header h1 { font-size: 36px; font-weight: 700; }
-        .auth-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
-        .auth-tab { flex: 1; padding: 12px; background: transparent; border: none; color: var(--text-secondary); font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; }
-        .auth-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
-        .auth-form { display: flex; flex-direction: column; gap: 16px; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        .input-group label { font-size: 14px; color: var(--text-secondary); }
-        .input-group input { padding: 14px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-primary); font-size: 16px; outline: none; }
-        .input-group input:focus { border-color: var(--accent); }
-        .btn-primary { padding: 14px; background: var(--accent); border: none; border-radius: 12px; color: white; font-weight: 600; font-size: 16px; cursor: pointer; }
-        .btn-primary:hover { background: var(--accent-hover); }
-        .error-message { color: var(--danger); font-size: 14px; min-height: 20px; }
-        .main-screen { display: flex; height: 100%; }
-        .sidebar { width: 320px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
-        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-weight: 600; }
-        .user-info { display: flex; flex-direction: column; }
-        .user-info .status { font-size: 12px; color: var(--success); }
-        .icon-btn { width: 40px; height: 40px; border-radius: 50%; background: transparent; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .icon-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-        .search-box { padding: 12px 16px; display: flex; align-items: center; gap: 10px; background: var(--bg-tertiary); margin: 8px 12px; border-radius: 24px; }
-        .search-box i { color: var(--text-secondary); }
-        .search-box input { background: transparent; border: none; outline: none; color: var(--text-primary); width: 100%; }
-        .chat-tabs { display: flex; padding: 0 12px; gap: 8px; margin-bottom: 8px; }
-        .tab-btn { flex: 1; padding: 8px; background: transparent; border: none; color: var(--text-secondary); font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; }
-        .tab-btn.active { color: var(--text-primary); border-bottom-color: var(--accent); }
-        .chat-list-container { flex: 1; overflow-y: auto; padding: 4px 8px; }
-        .chat-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; }
-        .chat-item:hover { background: var(--bg-tertiary); }
-        .chat-item.active { background: var(--bg-tertiary); border-left: 3px solid var(--accent); }
-        .chat-item .avatar { width: 48px; height: 48px; }
-        .chat-item-info { flex: 1; min-width: 0; }
-        .chat-item-title { font-weight: 600; display: flex; justify-content: space-between; }
-        .chat-item-lastmsg { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-primary); }
-        .chat-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); }
-        .mobile-back-btn { display: none; background: none; border: none; color: var(--text-secondary); font-size: 20px; margin-right: 12px; cursor: pointer; }
-        .chat-info { display: flex; align-items: center; gap: 12px; }
-        .chat-details h3 { font-size: 16px; font-weight: 600; }
-        .chat-details p { font-size: 13px; color: var(--text-secondary); }
-        .messages-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .empty-chat-message { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary); }
-        .message-row { display: flex; gap: 10px; max-width: 75%; }
-        .message-row.own { align-self: flex-end; flex-direction: row-reverse; }
-        .message-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0; }
-        .message-bubble { background: var(--bg-tertiary); padding: 12px 16px; border-radius: 18px; border-top-left-radius: 4px; }
-        .own .message-bubble { background: var(--accent); border-top-left-radius: 18px; border-top-right-radius: 4px; }
-        .message-meta { display: flex; justify-content: flex-end; font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
-        .message-input-area { padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-top: 1px solid var(--border-color); background: var(--bg-secondary); }
-        .message-input-area input { flex: 1; padding: 12px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 24px; color: var(--text-primary); outline: none; }
-        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 18px; cursor: pointer; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; }
-        .modal-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-secondary); border-radius: 24px; padding: 24px; width: 90%; max-width: 400px; z-index: 1001; display: none; box-shadow: var(--shadow); }
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; position: absolute; left: 0; top: 0; bottom: 0; z-index: 10; transition: transform 0.3s; }
-            .sidebar.hidden { transform: translateX(-100%); }
-            .chat-area { width: 100%; }
-            .mobile-back-btn { display: block; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>.drm – серебряный мессенджер</title>
+  <!-- Шрифты и иконки -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/base/reset.css">
+  <link rel="stylesheet" href="css/base/variables.css">
+  <link rel="stylesheet" href="css/base/typography.css">
+  <link rel="stylesheet" href="css/layout/auth.css">
+  <link rel="stylesheet" href="css/layout/sidebar.css">
+  <link rel="stylesheet" href="css/layout/chat-area.css">
+  <link rel="stylesheet" href="css/layout/responsive.css">
+  <link rel="stylesheet" href="css/components/buttons.css">
+  <link rel="stylesheet" href="css/components/inputs.css">
+  <link rel="stylesheet" href="css/components/avatars.css">
+  <link rel="stylesheet" href="css/components/modals.css">
+  <link rel="stylesheet" href="css/components/messages.css">
+  <link rel="stylesheet" href="css/components/wall-posts.css">
+  <link rel="stylesheet" href="css/themes/dark-silver.css">
 </head>
 <body>
-    <div id="app">
-        <div id="loading" class="loading-screen">Загрузка...</div>
-        <div id="auth-screen" class="screen auth-screen" style="display: none;">
-            <div class="auth-container">
-                <div class="auth-header"><h1>.drm</h1><p>мессенджер для своих</p></div>
-                <div id="auth-forms"></div>
-            </div>
-        </div>
-        <div id="main-screen" class="screen main-screen" style="display: none;">
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-header">
-                    <div class="user-profile" id="userProfileBtn">
-                        <div class="avatar" id="currentUserAvatar"></div>
-                        <div class="user-info"><span id="currentUserTag"></span><span class="status">онлайн</span></div>
-                    </div>
-                    <button class="icon-btn" id="newChatBtn"><i class="fas fa-edit"></i></button>
-                </div>
-                <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Поиск чата или пользователя..."></div>
-                <nav class="chat-tabs"><button class="tab-btn active" data-tab="chats">Чаты</button><button class="tab-btn" data-tab="users">Пользователи</button></nav>
-                <div class="chat-list-container" id="chatListContainer"></div>
-            </aside>
-            <main class="chat-area" id="chatArea">
-                <div class="chat-header" id="chatHeader">
-                    <button class="mobile-back-btn" id="mobileBackBtn"><i class="fas fa-arrow-left"></i></button>
-                    <div class="chat-info" id="chatInfo">
-                        <div class="avatar" id="chatAvatar"></div>
-                        <div class="chat-details"><h3 id="chatTitle">Выберите чат</h3><p id="chatSubtitle"></p></div>
-                    </div>
-                    <div class="chat-actions"><button class="icon-btn" id="chatMenuBtn"><i class="fas fa-ellipsis-v"></i></button></div>
-                </div>
-                <div class="messages-container" id="messagesContainer"><div class="empty-chat-message"><i class="fas fa-comments"></i><p>Выберите чат или создайте новый</p></div></div>
-                <div class="message-input-area" id="messageInputArea" style="display: none;">
-                    <button class="icon-btn"><i class="far fa-smile"></i></button>
-                    <input type="text" id="messageInput" placeholder="Сообщение...">
-                    <button class="send-btn" id="sendMessageBtn"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </main>
-        </div>
-        <div id="modal-overlay" class="modal-overlay"></div>
-        <div id="modal-container" class="modal-container"></div>
+  <div id="app">
+    <!-- Экран загрузки (будет скрыт после инициализации) -->
+    <div id="loading" class="loading-screen">
+      <div class="loader"></div>
+      <span>.drm</span>
     </div>
-    <script>
-        (function(){
-            // === Хранилище ===
-            const STORAGE_KEYS = { USERS: 'drm_users', CURRENT_USER: 'drm_currentUser', MESSAGES: 'drm_messages', CHATS: 'drm_chats' };
-            function initStorage() {
-                if (!localStorage.getItem(STORAGE_KEYS.USERS)) localStorage.setItem(STORAGE_KEYS.USERS, '[]');
-                if (!localStorage.getItem(STORAGE_KEYS.MESSAGES)) localStorage.setItem(STORAGE_KEYS.MESSAGES, '{}');
-                if (!localStorage.getItem(STORAGE_KEYS.CHATS)) localStorage.setItem(STORAGE_KEYS.CHATS, '{}');
-            }
-            initStorage();
-            const getUsers = () => JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS));
-            const saveUser = (user) => { const users = getUsers(); users.push(user); localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users)); };
-            const findUserByTag = (tag) => getUsers().find(u => u.tag.toLowerCase() === tag.toLowerCase());
-            const getCurrentUser = () => JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
-            const setCurrentUser = (user) => localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
-            const logout = () => localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-            const getUserChats = (userId) => { const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.CHATS)); return all[userId] || []; };
-            const addChatToUser = (userId, chatId) => { const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.CHATS)); if(!all[userId]) all[userId]=[]; if(!all[userId].includes(chatId)) all[userId].push(chatId); localStorage.setItem(STORAGE_KEYS.CHATS, JSON.stringify(all)); };
-            const getMessages = (chatId) => { const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES)); return all[chatId] || []; };
-            const saveMessage = (chatId, msg) => { const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.MESSAGES)); if(!all[chatId]) all[chatId]=[]; all[chatId].push(msg); localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(all)); };
-            const saveChatMeta = (chat) => localStorage.setItem(`chat_${chat.id}`, JSON.stringify(chat));
-            const getChatMeta = (id) => JSON.parse(localStorage.getItem(`chat_${id}`));
-            
-            // === Утилиты ===
-            const genId = () => Date.now() + '-' + Math.random().toString(36).substr(2,9);
-            const formatTime = (ts) => ts ? new Date(ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
-            
-            // === Глобальные переменные ===
-            let currentUser = null;
-            let currentChatId = null;
-            
-            // === UI хелперы ===
-            function showScreen(name) {
-                document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-                if(name==='auth') document.getElementById('auth-screen').style.display = 'flex';
-                else if(name==='main') document.getElementById('main-screen').style.display = 'flex';
-                document.getElementById('loading').style.display = 'none';
-            }
-            function showModal(content) {
-                document.getElementById('modal-container').innerHTML = content;
-                document.getElementById('modal-overlay').style.display = 'block';
-                document.getElementById('modal-container').style.display = 'block';
-            }
-            function hideModal() {
-                document.getElementById('modal-overlay').style.display = 'none';
-                document.getElementById('modal-container').style.display = 'none';
-            }
-            
-            // === Аутентификация ===
-            function renderAuthForms() {
-                const html = `
-                    <div class="auth-tabs"><button class="auth-tab active" data-tab="login">Вход</button><button class="auth-tab" data-tab="register">Регистрация</button></div>
-                    <div id="login-form" class="auth-form">
-                        <div class="input-group"><label>Тег</label><input type="text" id="loginTag" placeholder="your_tag"></div>
-                        <div class="input-group"><label>Пароль</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
-                        <div class="error-message" id="loginError"></div>
-                        <button class="btn-primary" id="loginBtn">Войти</button>
-                    </div>
-                    <div id="register-form" class="auth-form" style="display:none;">
-                        <div class="input-group"><label>Имя</label><input type="text" id="regName" placeholder="Иван"></div>
-                        <div class="input-group"><label>Уникальный тег</label><input type="text" id="regTag" placeholder="ivan2000"></div>
-                        <div class="input-group"><label>Пароль</label><input type="password" id="regPassword" placeholder="••••••••"></div>
-                        <div class="error-message" id="regError"></div>
-                        <button class="btn-primary" id="registerBtn">Зарегистрироваться</button>
-                    </div>
-                `;
-                document.getElementById('auth-forms').innerHTML = html;
-                document.querySelectorAll('.auth-tab').forEach(t => t.addEventListener('click', function(){
-                    document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById('login-form').style.display = this.dataset.tab==='login'?'flex':'none';
-                    document.getElementById('register-form').style.display = this.dataset.tab==='login'?'none':'flex';
-                }));
-                document.getElementById('loginBtn').addEventListener('click', ()=>{
-                    const tag = document.getElementById('loginTag').value.trim();
-                    const pwd = document.getElementById('loginPassword').value;
-                    const err = document.getElementById('loginError');
-                    if(!tag||!pwd) { err.textContent='Заполните поля'; return; }
-                    const u = findUserByTag(tag);
-                    if(!u||u.password!==pwd) { err.textContent='Неверный тег или пароль'; return; }
-                    const sess = {...u}; delete sess.password; setCurrentUser(sess); currentUser = sess;
-                    showMainScreen();
-                });
-                document.getElementById('registerBtn').addEventListener('click', ()=>{
-                    const name = document.getElementById('regName').value.trim();
-                    const tag = document.getElementById('regTag').value.trim();
-                    const pwd = document.getElementById('regPassword').value;
-                    const err = document.getElementById('regError');
-                    if(!name||!tag||!pwd) { err.textContent='Заполните поля'; return; }
-                    if(tag.length<3) { err.textContent='Тег минимум 3 символа'; return; }
-                    if(pwd.length<4) { err.textContent='Пароль минимум 4 символа'; return; }
-                    if(findUserByTag(tag)) { err.textContent='Тег занят'; return; }
-                    const newUser = { id: genId(), name, tag, password, avatar: name.charAt(0).toUpperCase() };
-                    saveUser(newUser);
-                    const sess = {...newUser}; delete sess.password; setCurrentUser(sess); currentUser = sess;
-                    showMainScreen();
-                });
-            }
-            
-            function showMainScreen() {
-                showScreen('main');
-                document.getElementById('currentUserTag').textContent = '@'+currentUser.tag;
-                document.getElementById('currentUserAvatar').textContent = currentUser.avatar;
-                loadChats();
-                setupMainListeners();
-            }
-            
-            // === Чаты ===
-            function loadChats() {
-                const ids = getUserChats(currentUser.id);
-                const chats = ids.map(getChatMeta).filter(Boolean).sort((a,b)=>b.updatedAt - a.updatedAt);
-                renderChatList(chats);
-            }
-            function renderChatList(chats) {
-                const container = document.getElementById('chatListContainer');
-                if(!chats.length) { container.innerHTML = '<div class="empty-chat-message" style="padding:20px;">Нет чатов</div>'; return; }
-                container.innerHTML = chats.map(chat => {
-                    const other = chat.participants.find(p=>p.id!==currentUser.id);
-                    return `<div class="chat-item" data-chat-id="${chat.id}">
-                        <div class="avatar">${other?.avatar||'?'}</div>
-                        <div class="chat-item-info"><div class="chat-item-title"><span>${other?.name||'Чат'}</span><span>${formatTime(chat.updatedAt)}</span></div>
-                        <div class="chat-item-lastmsg">${chat.lastMessage||'Нет сообщений'}</div></div>
-                    </div>`;
-                }).join('');
-                container.querySelectorAll('.chat-item').forEach(el => el.addEventListener('click', ()=>openChat(el.dataset.chatId)));
-            }
-            function openChat(chatId) {
-                currentChatId = chatId;
-                const chat = getChatMeta(chatId);
-                if(!chat) return;
-                const other = chat.participants.find(p=>p.id!==currentUser.id);
-                document.getElementById('chatTitle').textContent = other?.name||'Чат';
-                document.getElementById('chatAvatar').textContent = other?.avatar||'?';
-                document.getElementById('chatSubtitle').textContent = 'онлайн';
-                document.getElementById('messageInputArea').style.display = 'flex';
-                renderMessages();
-                if(window.innerWidth<=768) document.getElementById('sidebar').classList.add('hidden');
-            }
-            function renderMessages() {
-                const msgs = getMessages(currentChatId);
-                const container = document.getElementById('messagesContainer');
-                if(!msgs.length) { container.innerHTML = '<div class="empty-chat-message">Нет сообщений</div>'; return; }
-                container.innerHTML = msgs.map(m=>{
-                    const own = m.senderId === currentUser.id;
-                    return `<div class="message-row ${own?'own':''}">
-                        <div class="message-avatar">${m.senderAvatar||'?'}</div>
-                        <div class="message-bubble">${m.text}<div class="message-meta">${formatTime(m.timestamp)}</div></div>
-                    </div>`;
-                }).join('');
-                container.scrollTop = container.scrollHeight;
-            }
-            function sendMessage() {
-                if(!currentChatId) return;
-                const input = document.getElementById('messageInput');
-                const text = input.value.trim();
-                if(!text) return;
-                const msg = { id: genId(), chatId: currentChatId, senderId: currentUser.id, senderAvatar: currentUser.avatar, text, timestamp: Date.now() };
-                saveMessage(currentChatId, msg);
-                const chat = getChatMeta(currentChatId);
-                chat.lastMessage = text; chat.updatedAt = Date.now(); saveChatMeta(chat);
-                renderMessages();
-                loadChats();
-                input.value = '';
-            }
-            
-            // === Создание чата ===
-            function showNewChatModal() {
-                showModal(`<h3>Новый чат</h3><div class="input-group"><label>Тег пользователя</label><input type="text" id="newChatTag" placeholder="@tag"></div>
-                    <div class="error-message" id="modalError"></div>
-                    <div style="display:flex; gap:8px; margin-top:16px;"><button class="btn-primary" id="createChatBtn">Создать</button><button class="btn-secondary" id="cancelModalBtn">Отмена</button></div>`);
-                document.getElementById('createChatBtn').onclick = ()=>{
-                    const tag = document.getElementById('newChatTag').value.trim().replace('@','');
-                    const err = document.getElementById('modalError');
-                    if(!tag) { err.textContent='Введите тег'; return; }
-                    const target = findUserByTag(tag);
-                    if(!target) { err.textContent='Пользователь не найден'; return; }
-                    if(target.id===currentUser.id) { err.textContent='Нельзя с собой'; return; }
-                    const existing = getUserChats(currentUser.id).map(getChatMeta).find(c=>c.participants.some(p=>p.id===target.id));
-                    if(existing) { err.textContent='Чат уже есть'; return; }
-                    const chatId = genId();
-                    const chat = { id: chatId, participants: [
-                        { id: currentUser.id, name: currentUser.name, avatar: currentUser.avatar },
-                        { id: target.id, name: target.name, avatar: target.avatar }
-                    ], createdAt: Date.now(), updatedAt: Date.now(), lastMessage: '' };
-                    saveChatMeta(chat);
-                    addChatToUser(currentUser.id, chatId); addChatToUser(target.id, chatId);
-                    hideModal(); loadChats(); openChat(chatId);
-                };
-                document.getElementById('cancelModalBtn').onclick = hideModal;
-            }
-            
-            function showUsersList() {
-                const users = getUsers().filter(u=>u.id!==currentUser.id);
-                const container = document.getElementById('chatListContainer');
-                container.innerHTML = users.map(u=>`<div class="chat-item" data-user-id="${u.id}"><div class="avatar">${u.avatar}</div><div class="chat-item-info"><div class="chat-item-title">${u.name}</div><div class="chat-item-lastmsg">@${u.tag}</div></div></div>`).join('');
-                container.querySelectorAll('.chat-item').forEach(el=>el.addEventListener('click', ()=>{
-                    const uid = el.dataset.userId;
-                    const existing = getUserChats(currentUser.id).map(getChatMeta).find(c=>c.participants.some(p=>p.id===uid));
-                    if(existing) openChat(existing.id);
-                    else {
-                        const target = users.find(u=>u.id===uid);
-                        const chatId = genId();
-                        const chat = { id: chatId, participants: [
-                            { id: currentUser.id, name: currentUser.name, avatar: currentUser.avatar },
-                            { id: target.id, name: target.name, avatar: target.avatar }
-                        ], createdAt: Date.now(), updatedAt: Date.now(), lastMessage: '' };
-                        saveChatMeta(chat);
-                        addChatToUser(currentUser.id, chatId); addChatToUser(target.id, chatId);
-                        loadChats(); openChat(chatId);
-                    }
-                }));
-            }
-            
-            function setupMainListeners() {
-                document.getElementById('newChatBtn').onclick = showNewChatModal;
-                document.getElementById('sendMessageBtn').onclick = sendMessage;
-                document.getElementById('messageInput').onkeypress = e=>{ if(e.key==='Enter') sendMessage(); };
-                document.querySelectorAll('.tab-btn').forEach(b=>b.onclick=function(){
-                    document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
-                    this.classList.add('active');
-                    this.dataset.tab==='users'? showUsersList() : loadChats();
-                });
-                document.getElementById('searchInput').oninput = e=>{
-                    const q = e.target.value.toLowerCase();
-                    document.querySelectorAll('.chat-item').forEach(el=>{
-                        const title = el.querySelector('.chat-item-title span')?.textContent.toLowerCase()||'';
-                        el.style.display = title.includes(q)?'flex':'none';
-                    });
-                };
-                document.getElementById('mobileBackBtn').onclick = ()=>document.getElementById('sidebar').classList.remove('hidden');
-                document.getElementById('userProfileBtn').onclick = ()=>logout()||(showScreen('auth'), renderAuthForms());
-                window.onresize = ()=>{ if(window.innerWidth>768) document.getElementById('sidebar').classList.remove('hidden'); };
-            }
-            
-            // === Старт ===
-            const savedUser = getCurrentUser();
-            if(savedUser) { currentUser = savedUser; showMainScreen(); }
-            else { showScreen('auth'); renderAuthForms(); }
-        })();
-    </script>
+
+    <!-- Контейнер для авторизации (будет заполнен через JS) -->
+    <div id="auth-container" class="screen" style="display: none;"></div>
+
+    <!-- Основной интерфейс мессенджера (будет заполнен через JS) -->
+    <div id="main-container" class="screen" style="display: none;"></div>
+  </div>
+
+  <!-- Модальное окно (глобальное) -->
+  <div id="modal-overlay" class="modal-overlay"></div>
+  <div id="modal-container" class="modal-container"></div>
+
+  <!-- Подключаем главный модуль приложения -->
+  <script type="module" src="js/core/app.js"></script>
 </body>
 </html>
