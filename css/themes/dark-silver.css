@@ -1,0 +1,29 @@
+/* Дополнительные настройки тёмно-серебристой темы */
+:root {
+  --scrollbar-thumb: #3a4450;
+  --scrollbar-track: transparent;
+}
+
+/* Стилизация скроллбаров */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Выделение текста */
+::selection {
+  background: var(--accent);
+  color: white;
+}

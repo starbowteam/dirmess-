@@ -1,0 +1,40 @@
+:root {
+  /* Основные фоны */
+  --bg-primary: #0e1217;
+  --bg-secondary: #161e26;
+  --bg-tertiary: #1f2937;
+
+  /* Текст */
+  --text-primary: #eaeef2;
+  --text-secondary: #9aaebb;
+  --text-muted: #6a7a8a;
+
+  /* Акцент – серебристый */
+  --accent: #5f6c80;
+  --accent-light: #78879c;
+  --accent-dark: #4a5563;
+
+  /* Границы */
+  --border-color: #2d3743;
+  --border-light: #3a4552;
+
+  /* Статусы */
+  --success: #47b881;
+  --danger: #d95b5b;
+  --warning: #e6a040;
+
+  /* Тени */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+
+  /* Скругления */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Переходы */
+  --transition: all 0.2s ease;
+}

@@ -1,0 +1,60 @@
+/* Планшеты и мобильные */
+@media (max-width: 768px) {
+  #main-container {
+    position: relative;
+  }
+
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 320px;
+    z-index: 20;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.hidden {
+    transform: translateX(-100%);
+  }
+
+  .chat-area {
+    width: 100%;
+  }
+
+  .mobile-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-header {
+    padding: 12px 16px;
+  }
+
+  .messages-container {
+    padding: 12px;
+  }
+
+  .message-input-area {
+    padding: 12px 16px;
+  }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+  .sidebar {
+    max-width: 280px;
+  }
+
+  .auth-screen {
+    padding: 24px 16px;
+  }
+
+  .auth-header h1 {
+    font-size: 36px;
+  }
+}
